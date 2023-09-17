@@ -109,37 +109,16 @@ function draw() {
   strokeWeight(7);
   fill('#ccf2f1');
   rect(390, 140, 100, 145, 100, 100, 2, 2);
+  //둥근 창문_1 창살
+  strokeWeight(6);
+  line(340, 118, 440, 118);
+  line(340, 168, 440, 168);
+  line(390, 70, 390, 210);
   //둥근 창문_2
   stroke('#775b40');
   strokeWeight(7);
   fill('#ccf2f1');
   rect(520, 140, 100, 145, 100, 100, 2, 2);
-  //구름_1
-  noStroke(0);
-  fill('#ffffff');
-  ellipse(381, 130, 34);
-  ellipse(405, 140, 28);
-  ellipse(364, 144, 28);
-  ellipse(382, 146, 40);
-  ellipse(402, 152, 22);
-  //구름_2
-  ellipse(521, 110, 34);
-  ellipse(545, 120, 28);
-  ellipse(504, 124, 28);
-  ellipse(522, 126, 40);
-  ellipse(542, 132, 22);
-  //초원_1
-  fill('#c1db71');
-  rect(390, 199, 93, 20);
-  //초원_2
-  fill('#c1db71');
-  rect(520, 199, 93, 20);
-  //둥근 창문_1 창살
-  stroke('#775b40');
-  strokeWeight(6);
-  line(340, 118, 440, 118);
-  line(340, 168, 440, 168);
-  line(390, 70, 390, 210);
   //둥근 창문_2 창살
   strokeWeight(6);
   line(470, 118, 570, 118);

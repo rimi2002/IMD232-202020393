@@ -1,0 +1,21 @@
+let mover;
+let gravity;
+let wind;
+
+function setup() {
+  setCanvasContainer('mySketchGoesHere', 3, 2, true);
+  background('white');
+  mover = new MoverNoMass(width / 2, height / 2, 50);
+  gravity = createVector(0, 0.1);
+  wind = createVector(0.5, 0);
+}
+function draw() {
+  background(255);
+
+  mover.addAcc(gravity);
+  mover.addAcc(wind);
+  mover.update();
+  mover.checkEdges();
+  mover.display();
+  mover.displayVectors();
+}

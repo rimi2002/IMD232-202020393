@@ -1,27 +1,27 @@
 let pos;
 let vel;
 let acc;
-let mv;
 
 function setup() {
   setCanvasContainer('canvas', 1, 1, true);
   background('white');
-  pos = createVector(0, 0);
+  pos = createVector(random(width), random(height));
   vel = createVector(0, 0);
-  acc = p5.Vector.random2D();
-  mv = createVector();
+  acc = createVector();
 }
 
 function draw() {
   background('white');
-  acc = p5.Vector.random2D();
-  acc.mult(1);
+
+  let posMv = createVector(mouseX, mouseY).sub(pos);
+
+  posMv.setMag(0.1);
+
+  acc = posMv;
+
   vel.add(acc);
   vel.limit(10);
   pos.add(vel);
-
-  mv.x = mouseX;
-  mv.y = mouseY;
 
   if (pos.x < 0) {
     pos.x = width;
@@ -33,20 +33,18 @@ function draw() {
   } else if (pos.y > height) {
     pos.y = 0;
   }
+
   noStroke();
   fill('black');
   ellipse(pos.x, pos.y, 50);
 
   strokeWeight(2);
   stroke('black');
-  line(pos.x, pos.y, mv.x, mv.y);
+  line(pos.x, pos.y, mouseX, mouseY);
 
   stroke('crimson');
-  acc.sub(vel);
-  line(pos.x, pos.y, pos.x - 10 * vel.x, pos.y - 10 * vel.y);
+  line(pos.x, pos.y, pos.x + 10 * vel.x, pos.y + 10 * vel.y);
 
   stroke('cornflowerblue');
-  let blueline = p5.Vector.sub(acc, vel);
-
-  line(pos.x, pos.y, pos.x - 10 * blueline.x, pos.y - 10 * blueline.y);
+  line(pos.x, pos.y, pos.x + 100 * acc.x, pos.y + 100 * acc.y);
 }

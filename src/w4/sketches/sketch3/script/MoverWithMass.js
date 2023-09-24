@@ -1,14 +1,17 @@
-class MoverNoMass {
-  constructor(x, y, r) {
+class MoverWithMass {
+  constructor(x, y, mass) {
     this.pos = createVector(x, y);
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
     this.accDisplay = createVector(0, 0);
-    this.radius = r;
+    this.mass = mass;
+    this.radius = this.mass ** 0.5 * 10;
   }
 
-  addAcc(accInput) {
-    this.acc.add(accInput);
+  applyForce(force) {
+    let forceDividedByMass = createVector(force.x, force.y);
+    forceDividedByMass.div(this.mass);
+    this.acc.add(forceDividedByMass);
   }
 
   update() {

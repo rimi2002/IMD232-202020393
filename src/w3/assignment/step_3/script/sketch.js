@@ -1,7 +1,7 @@
 let pos;
 let vel;
 let acc;
-let run;
+let followingMouse = true; // 마우스를 따라갈지 여부를 나타내는 플래그
 
 function setup() {
   setCanvasContainer('canvas', 1, 1, true);
@@ -9,7 +9,6 @@ function setup() {
   pos = createVector(random(width), random(height));
   vel = createVector(0, 0);
   acc = createVector();
-  run = createVector(pos.x - vel.x, pos.y - vel.y);
 }
 
 function draw() {
@@ -19,7 +18,17 @@ function draw() {
 
   posMv.setMag(0.1);
 
-  acc = posMv;
+  if (mouseIsPressed) {
+    followingMouse = false;
+  } else {
+    followingMouse = true;
+  }
+
+  if (followingMouse) {
+    acc = posMv;
+  } else {
+    acc.mult(0);
+  }
 
   vel.add(acc);
   vel.limit(10);
@@ -34,10 +43,6 @@ function draw() {
     pos.y = height;
   } else if (pos.y > height) {
     pos.y = 0;
-  }
-
-  if (mouseIsPressed && isMouseInsideCanvas()) {
-    ellipse(pos.x - run.x, pos.y - run.y, 50);
   }
 
   noStroke();

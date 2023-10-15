@@ -1,62 +1,48 @@
-let pos;
-let vel;
-let acc;
-let mv;
+let bodies = [];
+const bodyNum = 30;
+let G = 1;
 
 function setup() {
   setCanvasContainer('canvas', 1, 1, true);
-  background('white');
-  pos = createVector(random(width), random(height));
-  vel = createVector(0, 0);
-  acc = p5.Vector.random2D();
-  mv = createVector();
+  reset();
 }
 
 function draw() {
-  background('white');
-  acc = p5.Vector.random2D();
-  acc.mult(1);
-  vel.add(acc);
-  vel.limit(10);
-  pos.add(vel);
+  background(255);
 
-  mv.x = mouseX;
-  mv.y = mouseY;
-
-  if (pos.x < 0) {
-    pos.x = width;
-  } else if (pos.x > width) {
-    pos.x = 0;
+  for (let i = 0; i < bodies.length; i++) {
+    for (let j = 0; j < bodies.length; j++) {
+      if (i !== j) {
+        let forceForJ = bodies[i].attract(bodies[j]);
+        bodies[j].applyForce(forceForJ);
+      }
+    }
+    bodies[i].update();
+    bodies[i].display();
+    // if (showVector) {
+    //   bodies[i].displayVectors();
+    // }
   }
-  if (pos.y < 0) {
-    pos.y = height;
-  } else if (pos.y > height) {
-    pos.y = 0;
-  }
-  noStroke();
-  fill('black');
-  ellipse(pos.x, pos.y, 50);
-
-  strokeWeight(2);
-  stroke('black');
-  line(pos.x, pos.y, mv.x, mv.y);
-
-  stroke('crimson');
-  acc.sub(vel);
-  line(pos.x, pos.y, pos.x - 10 * vel.x, pos.y - 10 * vel.y);
-
-  stroke('cornflowerblue');
-  let blueline = p5.Vector.sub(acc, vel);
-
-  line(pos.x, pos.y, pos.x - 10 * blueline.x, pos.y - 10 * blueline.y);
 }
 
-//   acc.sub(vel);
-//   translate(vel.x, vel.y);
-//   stroke('cornflowerblue');
-//   line(pos.x, pos.y, vel.x, vel.y);
+function mousePressed() {
+  if (isMouseInsideCanvas()) {
+    bodies = [];
+    reset();
+  }
+}
 
-//   mv = p5.Vector.sub(acc, vel);
-//   stroke('crimson');
-//   line(pos.x, pos.y, mv.x, mv.y);
+function reset() {
+  for (let i = 0; i < bodyNum; i++) {
+    // const mass = random(16, 100);
+    // const radius = sqrt(mass) * random(20, 50);
+    // bodies[i] = new Body(random(width), random(height), mass, radius);
+    bodies.push(new Body(random(width), random(height), random(0.1, 2)));
+  }
+}
+
+// function keyPressed() {
+//   if (key === 's' || key === 'S') {
+//     showVector = !showVector;
+//   }
 // }

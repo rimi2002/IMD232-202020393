@@ -1,52 +1,48 @@
-let pos;
-let vel;
-let acc;
-let mv;
+let mover;
+let gravity;
+let mVec;
+let pMVec;
 
 function setup() {
   setCanvasContainer('canvas', 1, 1, true);
-  background('white');
-  pos = createVector(0, 0);
-  vel = createVector(0, 0);
-  acc = p5.Vector.random2D();
-  mv = createVector();
+
+  mover = new Mover(width / 2, height / 2, 50);
+  gravity = createVector(0, 1);
+  throwingForce = 2;
+
+  mVec = createVector();
+  pMVec = createVector();
+
+  background(255);
 }
 
 function draw() {
-  background('white');
-  acc = p5.Vector.random2D();
-  acc.mult(1);
-  vel.add(acc);
-  vel.limit(10);
-  pos.add(vel);
+  const force = p5.Vector.mult(gravity, mover.mass);
 
-  mv.x = mouseX;
-  mv.y = mouseY;
+  background(255);
+  mover.update();
+  mover.display();
+}
 
-  if (pos.x < 0) {
-    pos.x = width;
-  } else if (pos.x > width) {
-    pos.x = 0;
-  }
-  if (pos.y < 0) {
-    pos.y = height;
-  } else if (pos.y > height) {
-    pos.y = 0;
-  }
-  noStroke();
-  fill('black');
-  ellipse(pos.x, pos.y, 50);
+function mouseMoved() {}
 
-  strokeWeight(2);
-  stroke('black');
-  line(pos.x, pos.y, mv.x, mv.y);
+function mousePressed() {
+  pMVec.set(pmouseX, pmouseY);
+}
 
-  stroke('crimson');
-  acc.sub(vel);
-  line(pos.x, pos.y, pos.x - 10 * vel.x, pos.y - 10 * vel.y);
+function mouseDragged() {
+  mVec.set(mouseX, mouseY);
+  let gravityForce = gravity.copy().mult(mover.mass);
+  mover.applyForce(gravityForce);
+  let throwingForceVec = p5.Vector.sub(mVec, pMVec);
+  throwingForceVec.mult(throwingForce);
+  mover.applyForce(throwingForceVec);
+  pMVec.set(mVec);
+}
 
-  stroke('cornflowerblue');
-  let blueline = p5.Vector.sub(acc, vel);
+function mouseReleased() {
+  pMVec.set(pmouseX, pmouseY);
+  mVec.set(mouseX, mouseY);
 
-  line(pos.x, pos.y, pos.x - 10 * blueline.x, pos.y - 10 * blueline.y);
+  mover.applyForce(throwingForce);
 }

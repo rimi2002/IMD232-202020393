@@ -1,70 +1,51 @@
+let mover;
+let attractor;
+let showVector = false;
+
+let G = 1;
+
 function setup() {
   setCanvasContainer('canvas', 3, 2, true);
-  background('orange');
+  mover = new Mover(300, 50, 2);
+  attractor = new Attractor();
 }
+
 function draw() {
-  background('orange');
-  fill(0);
-  //   if (mouseX > width / 2) {
-  //     rect(width / 2, 0, width / 2, height);
-  //   } else {
-  //     rect(0, 0, width / 2, height);
-  // }
+  background(255);
 
-  //   if (mouseX > width / 2) {
-  //     if (mouseY > height / 2) {
-  //       rect(width / 2, height / 2, width / 2, height / 2);
-  //     } else {
-  //       rect(width / 2, 0, width / 2, height / 2);
-  //     }
-  //   } else {
-  //     if (mouseY > height / 2) {
-  //       rect(width / 2, height / 2, width / 2, height / 2);
-  //     } else {
-  //       rect(0, 0, width / 2, height / 2);
-  //     }
-  //   }
-  // }
+  let force = attractor.attract(mover);
+  mover.applyForce(force);
+  mover.update();
+  mover.display();
+  if (showVector) {
+    mover.displayVectors();
+  }
 
-  if (mouseX > width / 3) {
-    if (mouseX > (2 * width) / 3) {
-      if (mouseY > height / 2) {
-        rect((2 * width) / 3, height / 2, width / 3, height / 2);
-      } else {
-        rect((2 * width) / 3, 0, width / 3, height / 2);
-      }
-    } else {
-      if (mouseY > height / 2) {
-        rect(width / 3, height / 2, width / 3, height / 2);
-      } else {
-        rect(width / 3, 0, width / 3, height / 2);
-      }
-    }
-  } else {
-    if (mouseY > height / 2) {
-      rect(0, height / 2, width / 3, height / 2);
-    } else {
-      rect(0, 0, width / 3, height / 2);
-    }
+  attractor.display();
+}
+
+function mouseMoved() {
+  if (!isMouseInsideCanvas()) return;
+  attractor.handleHover(mouseX, mouseY);
+}
+
+function mousePressed() {
+  if (!isMouseInsideCanvas()) return;
+  attractor.handlePress(mouseX, mouseY);
+}
+
+function mouseDragged() {
+  if (!isMouseInsideCanvas()) return;
+  attractor.handleDrag(mouseX, mouseY);
+}
+
+function mouseReleased() {
+  if (!isMouseInsideCanvas()) return;
+  attractor.stopDragging();
+}
+
+function keyPressed() {
+  if (key === 's' || key === 'S') {
+    showVector = !showVector;
   }
 }
-
-// if (mouseX > (width * 2) / 3) {
-//   if (mouseY > height / 2) {
-//     rect((width * 2) / 3, height / 2, width / 3, height / 2);
-//   } else {
-//     rect((width * 2) / 3, 0, width / 3, height / 2);
-//   }
-// } else if (mouseX > (width * 1) / 3) {
-//   if (mouseY > height / 2) {
-//     rect((width * 1) / 3, height / 2, width / 3, height / 2);
-//   } else {
-//     rect((width * 1) / 3, 0, width / 3, height / 2);
-//   }
-// } else {
-//   if (mouseY > height / 2) {
-//     rect(0, height / 2, width / 3, height / 2);
-//   } else {
-//     rect(0, 0, width / 3, height / 2);
-//   }
-// }

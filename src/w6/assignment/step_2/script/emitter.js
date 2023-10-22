@@ -1,35 +1,53 @@
 class Emitter {
-  constructor(x, y) {
-    this.particles = [];
-    this.position = createVector(x, y);
+  constructor(emittingPosX, emittingPosY) {
+    this.emittingPos = createVector(emittingPosX, emittingPosY);
+    this.balls = [];
+    this.ballNum = 1; // Set the number of balls to 100
+    this.hasCreatedBall = false;
+  }
+
+  createBall() {
+    if (this.hasCreatedBall) {
+      return;
+    }
+    for (let i = 0; i < this.ballNum; i++) {
+      // Loop through 100 times to create 100 balls
+      const angle = random(TAU);
+      const p = new Ball(
+        this.emittingPos.x,
+        this.emittingPos.y,
+        angle,
+        random(19, 20),
+        10,
+        random(28, 82)
+      );
+      this.balls.push(p);
+    }
+    this.hasCreatedBall = true;
+  }
+
+  applyGravity(gravity) {
+    this.balls.forEach((each) => {
+      const scaledG = p5.Vector.mult(gravity, each.mass);
+      each.applyForce(scaledG);
+    });
   }
 
   update() {
-    if (random(1) < 0.5) {
-      // 파티클을 더 자주 생성
-      this.createParticle();
-    }
-
-    for (let i = this.particles.length - 1; i >= 0; i--) {
-      const p = this.particles[i];
-      p.applyForce(gravity);
-      p.update();
-      if (p.isDead()) {
-        this.particles.splice(i, 1);
+    for (let i = this.balls.length - 1; i >= 0; i--) {
+      this.balls[i].update();
+      if (this.balls[i].isDead()) {
+        this.balls.splice(i, 1);
       }
     }
   }
 
   display() {
-    for (const p of this.particles) {
-      p.display();
-    }
+    this.balls.forEach((each) => {
+      each.display();
+    });
   }
-
-  createParticle() {
-    const x = random(width);
-    const y = random(-height / 2, 0); // 파티클이 화면 절반 이상 차 있도록 위치 설정
-    const p = new Particle(x, y, random(360), 100, 100);
-    this.particles.push(p);
+  isDead() {
+    return this.balls.length === 0;
   }
 }

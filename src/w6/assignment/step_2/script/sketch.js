@@ -1,36 +1,36 @@
-let emitter;
-let gravity;
+let emitters = [];
+let g;
+
 function setup() {
-  setcanvascontainer('canvas', 2, 1, true);
-  colorMode(HSL, 360, 100, 100, 100);
-  emitter = new Emitter(width / 2, height / 2);
-  gravity = createvector(0, 0.1);
-  background(360, 0, 100);
-  for (let n = 0; n < 100; n++) emitter.createParticle();
+  setCanvasContainer('canvas', 2, 1, true);
+  colorMode(HSL, 360, 100, 100);
+  g = createVector(0, 0.1);
+
+  background('#ebf8fc');
+  // emitters.push(new Emitter(width / 2, height / 2)); // Create an initial emitter
 }
 
 function draw() {
-  background('white');
-  console.log('현재 파티클 개수: ' + particles.length);
-  for (let i = particles.length - 1; i >= 0; i--) {
-    let p = particles[i];
-    p.applyForce(gravity);
-    p.update();
-    p.display();
-    if (p.isDead()) {
-      particles.splice(i, 1);
+  background('#ebf8fc');
+  console.log('createdEmittersNum :', emitters.length);
+
+  for (let i = emitters.length - 1; i >= 0; i--) {
+    emitters[i].createBall();
+    emitters[i].applyGravity(g);
+    emitters[i].update();
+    emitters[i].display();
+
+    if (emitters[i].isDead()) {
+      emitters.splice(i, 1);
     }
   }
 }
 
 function mousePressed() {
-  for (let i = 0; i < maxParticles; i++) {
-    let hue = random(360);
-    let angle = random(TWO_PI); // 무작위 방향을 선택
-    let magnitude = 3;
-    let vx = cos(angle) * magnitude;
-    let vy = sin(angle) * magnitude;
-    let p = new Particle(mouseX, mouseY, hue, vx, vy, random(360, 100, 100));
-    particles.push(p);
+  if (isMouseInsideCanvas()) {
+    for (let i = 0; i < 100; i++) {
+      const emitter = new Emitter(mouseX, mouseY);
+      emitters.push(emitter);
+    }
   }
 }

@@ -1,5 +1,7 @@
 let engine, world, ropeA, ropeB, ropeC, mouseConstraint;
 
+Common.setDecomp(require('poly-decomp'));
+
 function setup() {
   // create canvas
   createCanvas(800, 600);

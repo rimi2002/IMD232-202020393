@@ -1,7 +1,6 @@
-const oWidth = 800;
-const oHeight = 600;
+const CanWidth = 800;
+const CanHeight = 600;
 
-// 기본 변수 선언
 const {
   Engine,
   Render,
@@ -17,14 +16,11 @@ const {
   Vertices,
 } = Matter;
 
-//decomp 사용
 Common.setDecomp(decomp);
 
-// create engine
 const engine = Engine.create(),
   world = engine.world;
 
-// create runner
 const runner = Runner.create();
 Runner.run(runner, engine);
 const walls = [];
@@ -37,43 +33,41 @@ let ropeC;
 let mouse;
 
 function setup() {
-  setCanvasContainer('canvas', oHeight, oHeight, true);
+  setCanvasContainer('canvas', CanHeight, CanHeight, true);
 
-  //도형 설정
   const concave1 = (vertices = [
-    { x: -28, y: 0 },
-    { x: -10, y: -18 },
-    { x: 28, y: -6 },
-    { x: 4, y: 12 },
-    { x: 0, y: 44 },
-    { x: -24, y: 23 },
+    { x: -37, y: 0 },
+    { x: -30, y: -28 },
+    { x: 18, y: -16 },
+    { x: 5, y: 2 },
+    { x: 2, y: 24 },
+    { x: -14, y: 23 },
   ]);
   concave2 = vertices = [
-    { x: 33.33, y: 0 },
-    { x: 23.33, y: 16.67 },
-    { x: 33.33, y: 33.33 },
-    { x: -8.67, y: 33.33 },
-    { x: 0, y: 16.67 },
-    { x: -8.67, y: 0 },
+    { x: 40, y: 0 },
+    { x: 10, y: 12 },
+    { x: 20, y: 25 },
+    { x: -10, y: 16 },
+    { x: 0, y: 10 },
+    { x: -10, y: 0 },
   ];
   concave3 = vertices = [
-    { x: 20, y: 0 },
-    { x: 20, y: 10 },
-    { x: 50, y: 10 },
-    { x: 50, y: 40 },
-    { x: 20, y: 40 },
-    { x: 20, y: 50 },
-    { x: 0, y: 25 },
+    { x: 10, y: 0 },
+    { x: 10, y: 30 },
+    { x: 40, y: 30 },
+    { x: 40, y: 30 },
+    { x: 10, y: 30 },
+    { x: 10, y: 40 },
+    { x: 0, y: 45 },
   ];
 
-  //다각형 분해
   const Body = decomp.quickDecomp(concave1);
   const Body2 = decomp.quickDecomp(concave2);
   const Body3 = decomp.quickDecomp(concave3);
 
   group = Matter.Body.nextGroup(true);
 
-  ropeA = Matter.Composites.stack(100, 50, 8, 1, 10, 10, function (x, y) {
+  ropeA = Matter.Composites.stack(100, 50, 7, 1, 10, 10, function (x, y) {
     return Matter.Bodies.fromVertices(x, y, concave1, {
       collisionFilter: { group: group },
     });
@@ -96,7 +90,7 @@ function setup() {
 
   group = Matter.Body.nextGroup(true);
 
-  ropeB = Matter.Composites.stack(350, 50, 10, 1, 10, 10, function (x, y) {
+  ropeB = Matter.Composites.stack(350, 50, 8, 1, 10, 10, function (x, y) {
     return Matter.Bodies.fromVertices(x - 20, y, concave2, {
       collisionFilter: { group: group },
     });
@@ -120,7 +114,7 @@ function setup() {
 
   group = Matter.Body.nextGroup(true);
 
-  ropeC = Matter.Composites.stack(600, 50, 13, 1, 10, 10, function (x, y) {
+  ropeC = Matter.Composites.stack(600, 50, 16, 1, 10, 12, function (x, y) {
     return Matter.Bodies.fromVertices(x - 20, y, concave3, {
       collisionFilter: { group: group },
       chamfer: 5,
@@ -139,7 +133,6 @@ function setup() {
     })
   );
 
-  //요소를 세계에 추가하기
   Matter.Composite.add(world, [
     ropeA,
     ropeB,
@@ -147,9 +140,8 @@ function setup() {
     Matter.Bodies.rectangle(400, 600, 1200, 50.5, { isStatic: true }),
   ]);
 
-  // 마우스 컨트롤 추가하기
   mouse = Mouse.create(canvas.elt);
-  mouse.pixelRatio = (pixelDensity() * width) / oWidth;
+  mouse.pixelRatio = (pixelDensity() * width) / CanWidth;
   let mouseConstraint = MouseConstraint.create(engine, {
     mouse: mouse,
     constraint: {
@@ -159,10 +151,9 @@ function setup() {
 
   Composite.add(world, mouseConstraint);
 
-  background('#3F3A4A');
+  background('#fffaee');
   Runner.run(runner, engine);
 
-  //확인
   console.log('group', group);
   console.log('ropeA', ropeA);
   console.log('ropeB', ropeB);
@@ -171,54 +162,52 @@ function setup() {
 }
 
 function draw() {
-  mouse.pixelRatio = (pixelDensity() * width) / oWidth;
+  mouse.pixelRatio = (pixelDensity() * width) / CanWidth;
 
-  background('#3F3A4A');
-  colorMode(HSL);
-  stroke(54, 90, 80);
-  fill(54, 90, 80);
+  background('#fffaee');
+
+  stroke('#ffea94');
+  fill('#ffea94');
   ropeA.bodies.forEach((eachBody) => {
     eachBody.parts.forEach((eachPart, idx) => {
       if (idx === 0) return;
       beginShape();
       eachPart.vertices.forEach((eachVertex) => {
         vertex(
-          (eachVertex.x / oWidth) * width,
-          (eachVertex.y / oHeight) * height
+          (eachVertex.x / CanWidth) * width,
+          (eachVertex.y / CanHeight) * height
         );
       });
       endShape(CLOSE);
     });
   });
 
-  colorMode(HSL);
-  stroke(100, 90, 80);
-  fill(100, 90, 80);
+  stroke('#fcb3a2');
+  fill('#fcb3a2');
   ropeB.bodies.forEach((eachBody) => {
     eachBody.parts.forEach((eachPart, idx) => {
       if (idx === 0) return;
       beginShape();
       eachPart.vertices.forEach((eachVertex) => {
         vertex(
-          (eachVertex.x / oWidth) * width,
-          (eachVertex.y / oHeight) * height
+          (eachVertex.x / CanWidth) * width,
+          (eachVertex.y / CanHeight) * height
         );
       });
       endShape(CLOSE);
     });
   });
 
-  colorMode(HSL);
-  stroke(250, 90, 80);
-  fill(250, 90, 80);
+  stroke('#dfc5ef');
+  fill('#dfc5ef');
   ropeC.bodies.forEach((eachBody) => {
     eachBody.parts.forEach((eachPart, idx) => {
       if (idx === 0) return;
       beginShape();
       eachPart.vertices.forEach((eachVertex) => {
         vertex(
-          (eachVertex.x / oWidth) * width,
-          (eachVertex.y / oHeight) * height
+          (eachVertex.x / CanWidth) * width,
+          (eachVertex.y / CanHeight) * height
         );
       });
       endShape(CLOSE);

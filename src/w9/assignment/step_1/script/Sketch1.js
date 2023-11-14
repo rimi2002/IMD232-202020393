@@ -1,24 +1,83 @@
-let engine, world, ropeA, ropeB, ropeC, mouseConstraint;
+const oWidth = 800;
+const oHeight = 600;
 
-Common.setDecomp(require('poly-decomp'));
+// 기본 변수 선언
+const {
+  Engine,
+  Render,
+  Runner,
+  Body,
+  Composite,
+  Composites,
+  Constraint,
+  MouseConstraint,
+  Mouse,
+  Bodies,
+  Common,
+  Vertices,
+} = Matter;
 
-function setup() {
-  // create canvas
-  createCanvas(800, 600);
+//decomp 사용
+Common.setDecomp(decomp);
 
-  // create engine
-  engine = Matter.Engine.create();
+// create engine
+const engine = Engine.create(),
   world = engine.world;
 
-  // create bodies
-  let group = Matter.Body.nextGroup(true);
+// create runner
+const runner = Runner.create();
+Runner.run(runner, engine);
+const walls = [];
+
+let group;
+let ropeA;
+let ropeB;
+let ropeC;
+
+let mouse;
+
+function setup() {
+  setCanvasContainer('canvas', oHeight, oHeight, true);
+
+  //도형 설정
+  const concave1 = (vertices = [
+    { x: -28, y: 0 },
+    { x: -10, y: -18 },
+    { x: 28, y: -6 },
+    { x: 4, y: 12 },
+    { x: 0, y: 44 },
+    { x: -24, y: 23 },
+  ]);
+  concave2 = vertices = [
+    { x: 33.33, y: 0 },
+    { x: 23.33, y: 16.67 },
+    { x: 33.33, y: 33.33 },
+    { x: -8.67, y: 33.33 },
+    { x: 0, y: 16.67 },
+    { x: -8.67, y: 0 },
+  ];
+  concave3 = vertices = [
+    { x: 20, y: 0 },
+    { x: 20, y: 10 },
+    { x: 50, y: 10 },
+    { x: 50, y: 40 },
+    { x: 20, y: 40 },
+    { x: 20, y: 50 },
+    { x: 0, y: 25 },
+  ];
+
+  //다각형 분해
+  const Body = decomp.quickDecomp(concave1);
+  const Body2 = decomp.quickDecomp(concave2);
+  const Body3 = decomp.quickDecomp(concave3);
+
+  group = Matter.Body.nextGroup(true);
 
   ropeA = Matter.Composites.stack(100, 50, 8, 1, 10, 10, function (x, y) {
-    return Matter.Bodies.rectangle(x, y, 50, 20, {
+    return Matter.Bodies.fromVertices(x, y, concave1, {
       collisionFilter: { group: group },
     });
   });
-
   Matter.Composites.chain(ropeA, 0.5, 0, -0.5, 0, {
     stiffness: 0.8,
     length: 2,
@@ -38,7 +97,7 @@ function setup() {
   group = Matter.Body.nextGroup(true);
 
   ropeB = Matter.Composites.stack(350, 50, 10, 1, 10, 10, function (x, y) {
-    return Matter.Bodies.circle(x, y, 20, {
+    return Matter.Bodies.fromVertices(x - 20, y, concave2, {
       collisionFilter: { group: group },
     });
   });
@@ -62,7 +121,7 @@ function setup() {
   group = Matter.Body.nextGroup(true);
 
   ropeC = Matter.Composites.stack(600, 50, 13, 1, 10, 10, function (x, y) {
-    return Matter.Bodies.rectangle(x - 20, y, 50, 20, {
+    return Matter.Bodies.fromVertices(x - 20, y, concave3, {
       collisionFilter: { group: group },
       chamfer: 5,
     });
@@ -80,6 +139,7 @@ function setup() {
     })
   );
 
+  //요소를 세계에 추가하기
   Matter.Composite.add(world, [
     ropeA,
     ropeB,
@@ -87,44 +147,82 @@ function setup() {
     Matter.Bodies.rectangle(400, 600, 1200, 50.5, { isStatic: true }),
   ]);
 
-  // add mouse control
-  let canvasMouse = Matter.Mouse.create(canvas.elt),
-    mouseOptions = {
-      mouse: canvasMouse,
-    };
+  // 마우스 컨트롤 추가하기
+  mouse = Mouse.create(canvas.elt);
+  mouse.pixelRatio = (pixelDensity() * width) / oWidth;
+  let mouseConstraint = MouseConstraint.create(engine, {
+    mouse: mouse,
+    constraint: {
+      stiffness: 0.2,
+    },
+  });
 
-  mouseConstraint = Matter.MouseConstraint.create(engine, mouseOptions);
-  Matter.World.add(world, mouseConstraint);
+  Composite.add(world, mouseConstraint);
 
-  // keep the mouse in sync with rendering
-  Matter.Render.mouse = canvasMouse;
+  background('#3F3A4A');
+  Runner.run(runner, engine);
+
+  //확인
+  console.log('group', group);
+  console.log('ropeA', ropeA);
+  console.log('ropeB', ropeB);
+  console.log('ropeC', ropeC);
+  console.log('Bodies', Bodies);
 }
 
 function draw() {
-  // Update physics engine
-  Matter.Engine.update(engine);
+  mouse.pixelRatio = (pixelDensity() * width) / oWidth;
 
-  // Draw ropes and bodies
-  background(255);
-  drawRope(ropeA);
-  fill(0, 0, 250);
-  drawRope(ropeB);
-  fill(0, 250, 0);
-  drawRope(ropeC);
-  fill(250, 0, 0);
-}
+  background('#3F3A4A');
+  colorMode(HSL);
+  stroke(54, 90, 80);
+  fill(54, 90, 80);
+  ropeA.bodies.forEach((eachBody) => {
+    eachBody.parts.forEach((eachPart, idx) => {
+      if (idx === 0) return;
+      beginShape();
+      eachPart.vertices.forEach((eachVertex) => {
+        vertex(
+          (eachVertex.x / oWidth) * width,
+          (eachVertex.y / oHeight) * height
+        );
+      });
+      endShape(CLOSE);
+    });
+  });
 
-function drawRope(rope) {
-  //   fill(0, 150, 200); // Set the fill color
-  noStroke(); // No stroke (remove outline)
-  beginShape();
-  for (let i = 0; i < rope.bodies.length; i++) {
-    let pos = rope.bodies[i].position;
-    if (rope.bodies[i].label === 'Rectangle Body') {
-      rect(pos.x - 25, pos.y - 10, 50, 20);
-    } else if (rope.bodies[i].label === 'Circle Body') {
-      ellipse(pos.x, pos.y, 40, 40);
-    }
-  }
-  endShape();
+  colorMode(HSL);
+  stroke(100, 90, 80);
+  fill(100, 90, 80);
+  ropeB.bodies.forEach((eachBody) => {
+    eachBody.parts.forEach((eachPart, idx) => {
+      if (idx === 0) return;
+      beginShape();
+      eachPart.vertices.forEach((eachVertex) => {
+        vertex(
+          (eachVertex.x / oWidth) * width,
+          (eachVertex.y / oHeight) * height
+        );
+      });
+      endShape(CLOSE);
+    });
+  });
+
+  colorMode(HSL);
+  stroke(250, 90, 80);
+  fill(250, 90, 80);
+  ropeC.bodies.forEach((eachBody) => {
+    eachBody.parts.forEach((eachPart, idx) => {
+      if (idx === 0) return;
+      beginShape();
+      eachPart.vertices.forEach((eachVertex) => {
+        vertex(
+          (eachVertex.x / oWidth) * width,
+          (eachVertex.y / oHeight) * height
+        );
+      });
+      endShape(CLOSE);
+    });
+  });
+  console.log('length', ropeC.bodies[1].parts.length); //4
 }
